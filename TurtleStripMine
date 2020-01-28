@@ -1,6 +1,11 @@
-print("Remember to insert fuel into slot 1")
-print("Please type the length of the mine..")
+print("Remember to insert fuel")
+print("Please enter the length to mine..")
 input = read()
+
+while turtle.getFuelLevel() < 400 do
+  turtle.refuel
+end
+
 for i = 1, input do
   turtle.dig()
   turtle.forward()
