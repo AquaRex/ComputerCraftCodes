@@ -1,4 +1,4 @@
-print("Remember to insert fuel into slot 1")
+print("Remember to insert fuel")
 print("Please enter the length to dig")
 length = read()
 print("Please enter the height to dig")
