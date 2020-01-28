@@ -1,0 +1,43 @@
+print("Direction: ")
+input = read()
+
+if input == "w" then
+  turtle.forward()
+end
+
+
+if input == "s" then
+  turtle.back()
+end
+
+
+if input == "a" then
+  turtle.turnLeft()
+end
+
+
+if input == "d" then
+  turtle.turnRight()
+end
+
+
+if input == "up" then
+  turtle.up()
+end
+
+
+if input == "down" then
+  turtle.down()
+end
+
+
+if input == "upd" then
+  turtle.digUp()
+  turtle.up()
+end
+
+
+if input == "downd" then
+  turtle.digDown()
+  turtle.down()
+end
