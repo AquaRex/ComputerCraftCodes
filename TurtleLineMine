@@ -1,0 +1,22 @@
+print("Remember to insert fuel into slot 1")
+print("Please enter the length to dig")
+length = read()
+print("Please enter the height to dig")
+height = read()
+print("Thank you, proceeding")
+
+while turtle.getFuelLevel() < 400 do
+  turtle.refuel()
+end
+
+for i = 1, length do
+  turtle.dig()
+  turtle.forward()
+  for j = 1, height do
+    turtle.digUp()
+    turtle.up()
+  end
+  for k = 1, height do
+    turtle.down()
+  end
+end
