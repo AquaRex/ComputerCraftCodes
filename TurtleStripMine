@@ -1,0 +1,12 @@
+print("Remember to insert fuel into slot 1")
+print("Please type the length of the mine..")
+input = read()
+for i = 1, input do
+  turtle.dig()
+  turtle.forward()
+  turtle.digUp()
+end
+for j = 1, input do
+  turtle.back()
+end
+
