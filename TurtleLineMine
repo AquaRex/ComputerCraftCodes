@@ -19,4 +19,5 @@ for i = 1, length do
   for k = 1, height do
     turtle.down()
   end
+  print("line "+i+" of "+length)
 end
