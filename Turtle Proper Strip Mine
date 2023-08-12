@@ -1,0 +1,125 @@
+turtle.select(16)
+
+print("Insert fuel into selected slot")
+print("Enter the strip mine length")
+
+length = read()
+
+print("Enter the number of strip mines")
+
+numMine = read()
+
+local status = "running"
+local CurLength = 0
+local CurStrip = 0
+local MaxStrips = numMine
+
+-- #### FUNCTIONS ####
+
+
+-- ## Refueling
+function Refuel()
+  turtle.select(16)
+  turtle.refuel()
+end
+
+
+-- ## Check Fuel Level
+function CheckFuel()
+  if turtle.getFuelLevel() < 400 then
+    Refuel()
+  end
+end
+
+
+-- ## Place Chest
+function PlaceChest()
+  turtle.turnRight()
+  turtle.select(15) 
+  if turtle.detect() == false then
+    turtle.place()
+  else
+    return false
+  end
+  turtle.turnLeft()
+  return true
+end
+
+
+-- ## Dig Strip Forward
+function Forward()
+  if turtle.detect() == true then
+    turtle.dig()
+  end
+
+  turtle.forward()
+
+  if turtle.detectUp() == true then
+    turtle.digUp()
+  end
+end
+
+
+-- ## Move to Next Strip
+function NextStrip()
+  turtle.turnLeft()
+  for i = 1, 3 do
+    if turtle.detect() then
+      turtle.dig()
+    end
+    turtle.forward()
+    if turtle.detectUp() then
+      turtle.digUp()
+    end
+  end
+  turtle.turnRight()
+end
+  
+
+
+-- ## Return to chest location  NEED TO CHANGE TO MOVE FORWARD AND DETECT IN CASE OBJECTS HAVE DROPPED!
+function ReturnToChest()
+  for i = 1, CurLength do
+    turtle.back()
+  end
+end
+
+
+-- ## Drop Items In Chest
+function DropInChest()
+  turtle.turnRight()
+  if turtle.detect() == true then
+    for i = 1, 14 do
+      turtle.select(i)
+      turtle.drop()
+    end
+  end
+  turtle.turnLeft()
+end
+
+
+-- #### END OF FUNCTIONS ####
+
+
+
+for i = 1, MaxStrips do
+  CurLength = 0
+  CurStrip = i
+  PlaceChest()
+
+  for i = 1, length do
+    CurLength = i
+    CheckFuel()
+    if status == "running" then
+      Forward()
+    end
+  end
+  
+  ReturnToChest()
+
+  DropInChest()
+  
+  NextStrip()
+
+end
+
