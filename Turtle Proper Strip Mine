@@ -1,6 +1,8 @@
 turtle.select(16)
 
-print("Insert fuel into selected slot")
+print("Insert fuel into slot 16")
+print("Insert Chests into slot 15")
+print("Insert Torches into slot 14")
 print("Enter the strip mine length")
 
 length = read()
@@ -60,6 +62,15 @@ function Forward()
 end
 
 
+-- ## Place Torches
+function PlaceTorch()
+  if turtle.detectUp() == false then
+    turtle.select(14)
+    turtle.placeUp()
+  end
+end
+
+
 -- ## Move to Next Strip
 function NextStrip()
   turtle.turnLeft()
@@ -97,7 +108,7 @@ end
 -- ## Drop Items In Chest
 function DropInChest()
   if turtle.detect() then
-    for i = 1, 14 do
+    for i = 1, 13 do
       turtle.select(i)
       turtle.drop()
     end
@@ -118,6 +129,11 @@ for i = 1, MaxStrips do
   for i = 1, length do
     CurLength = i
     CheckFuel()
+
+    if i % 10 == 0 then
+      PlaceTorch()
+    end
+
     if status == "running" then
       Forward()
     end
