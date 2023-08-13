@@ -130,7 +130,7 @@ for i = 1, MaxStrips do
     CurLength = i
     CheckFuel()
 
-    if i % 10 == 0 then
+    if i % 13 == 0 then
       PlaceTorch()
     end
 
