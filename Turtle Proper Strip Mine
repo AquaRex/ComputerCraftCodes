@@ -48,13 +48,13 @@ end
 
 -- ## Dig Strip Forward
 function Forward()
-  if turtle.detect() == true then
+  while turtle.detect() do
     turtle.dig()
   end
 
   turtle.forward()
 
-  if turtle.detectUp() == true then
+  if turtle.detectUp() then
     turtle.digUp()
   end
 end
@@ -77,11 +77,21 @@ end
   
 
 
--- ## Return to chest location  NEED TO CHANGE TO MOVE FORWARD AND DETECT IN CASE OBJECTS HAVE DROPPED!
+-- ## Return to chest location
 function ReturnToChest()
+  turtle.turnRight()
+  turtle.turnRight()
+  
   for i = 1, CurLength do
-    turtle.back()
+    while turtle.detect() do
+      turtle.dig()
+    end
+    turtle.forward()
   end
+
+  turtle.turnLeft()
+  turtle.turnLeft()
+
 end
 
 
