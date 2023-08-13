@@ -64,7 +64,7 @@ end
 function NextStrip()
   turtle.turnLeft()
   for i = 1, 3 do
-    if turtle.detect() then
+    while turtle.detect() do
       turtle.dig()
     end
     turtle.forward()
@@ -90,15 +90,13 @@ function ReturnToChest()
   end
 
   turtle.turnLeft()
-  turtle.turnLeft()
 
 end
 
 
 -- ## Drop Items In Chest
 function DropInChest()
-  turtle.turnRight()
-  if turtle.detect() == true then
+  if turtle.detect() then
     for i = 1, 14 do
       turtle.select(i)
       turtle.drop()
