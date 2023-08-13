@@ -64,10 +64,12 @@ end
 
 -- ## Place Torches
 function PlaceTorch()
+  turtle.turnRight()
   if turtle.detectUp() == false then
     turtle.select(14)
     turtle.placeUp()
   end
+  turtle.turnLeft()
 end
 
 
@@ -135,8 +137,9 @@ for i = 1, MaxStrips do
     end
 
     if status == "running" then
-      Forward()
+      Forward(i)
     end
+
   end
   
   ReturnToChest()
