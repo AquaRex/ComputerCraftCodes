@@ -1,0 +1,176 @@
+turtle.select(16)
+--  This turtle program is designed to mine a 3D area of blocks
+
+
+print("Insert fuel into slot 16")
+print("Place Chest behind the turtle!")
+print("-----------------------------")
+print("Now enter the depth to be mined")
+
+depth = read()
+
+print("Now enter the length to be mined")
+
+width = read()
+
+print("Now enter the height to be mined")
+
+height = read()
+
+local status = "running"
+local CurDepth = 0
+local CurWidth = 0
+--## array of object names that CheckObject() should check for
+local objectCheckNames = {"chest","torch"}
+
+
+
+
+-- #### FUNCTIONS ####
+
+-- ## Refueling
+function Refuel()
+  turtle.select(16)
+  turtle.refuel()
+end
+
+-- ## Check Fuel Level
+function CheckFuel()
+  if turtle.getFuelLevel() < 400 then
+    Refuel()
+  end
+end
+
+--## Check the block in front or up for matches with the object database
+function CheckBlock(String, Up)
+  if not Up then
+    local success, data = turtle.inspect()
+    if success then
+      if String ~= "" then
+        if string.find(data.name, String) then
+          return true
+        end
+      else
+        for i = 1, #objectCheckNames do
+          if string.find(data.name, objectCheckNames[i]) then
+            return true
+          end
+        end
+      end
+    end
+  else
+    local success, data = turtle.inspectUp()
+    if success then
+      if String ~= "" then
+        if string.find(data.name, String) then
+          return true
+        end
+      else
+        for i = 1, #objectCheckNames do
+          if string.find(data.name, objectCheckNames[i]) then
+            return true
+          end
+        end
+      end
+    end
+  end
+  return false
+end
+
+-- ## Dig Up
+function Up()
+  if turtle.detectUp() and not CheckBlock("torch",true)  then
+    turtle.digUp()
+  end
+end
+
+
+
+-- ## Dig Forward
+function Forward()
+  while turtle.detect() do
+    turtle.dig()
+  end
+end
+
+-- ## Dig Block height(
+function DigBlock()
+  Forward()
+  turtle.forward() -- Move Forward
+  if height == 0 or 1 then
+  else
+    for i = 1, height do
+      Up()
+      turtle.up()
+    end
+    for i = 1, height do
+      turtle.down()
+    end
+  end
+end
+
+-- ## Move to the next strip in the 3d area
+function NextLine()
+  if CurWidth % 2 == 0 then
+    turtle.turnRight()
+    Forward()
+    turtle.turnRight()
+  else
+    turtle.turnLeft()
+    Forward()
+    turtle.turnLeft()
+  end
+end
+
+
+-- ## Return to original position
+function ReturnToChest()
+  turtle.turnRight()
+  for i = 1, CurWidth do
+    Forward()
+  end
+  turtle.turnRight()
+  for i = 1, CurDepth do
+    Forward()
+  end
+  turtle.turnRight()
+end
+
+
+-- ## Drop Items In Chest
+function DropInChest()
+  if turtle.detect() and CheckBlock("chest",false) then
+    for i = 1, 13 do
+      turtle.select(i)
+      turtle.drop()
+    end
+  end
+  turtle.turnLeft()
+end
+
+
+-- #### END OF FUNCTIONS ####
+
+Forward()
+
+for i = 1, width do
+  CurDepth = 0
+  CurWidth = i
+
+  for i = 1, depth do
+    CurDepth = i
+    CheckFuel()
+
+    if status == "running" then
+      DigBlock()
+    end
+
+  end
+  
+  ReturnToChest()
+
+  DropInChest()
+  
+  NextLine()
+
+end
