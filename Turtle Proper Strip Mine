@@ -41,6 +41,7 @@ function PlaceChest()
   if turtle.detect() == false then
     turtle.place()
   else
+    turtle.turnLeft()
     return false
   end
   turtle.turnLeft()
