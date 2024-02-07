@@ -62,7 +62,6 @@ function Forward()
   end
 end
 
-
 -- ## Place Torches
 function PlaceTorch()
   turtle.turnRight()
@@ -77,13 +76,18 @@ end
 -- ## Move to Next Strip
 function NextStrip()
   turtle.turnLeft()
-  for i = 1, 3 do
-    while turtle.detect() do
-      turtle.dig()
-    end
-    turtle.forward()
-    if turtle.detectUp() then
-      turtle.digUp()
+  for i = 1, 4 do
+    if turtle.detect() then
+      turtle.turnLeft()
+      turtle.forward()
+      turtle.turnRight()
+      turtle.forward()
+      turtle.forward()
+      turtle.turnRight()
+      turtle.forward()
+      turtle.turnLeft()
+    else
+      forward()
     end
   end
   turtle.turnRight()
@@ -97,10 +101,7 @@ function ReturnToChest()
   turtle.turnRight()
   
   for i = 1, CurLength do
-    while turtle.detect() do
-      turtle.dig()
-    end
-    turtle.forward()
+    forward()
   end
 
   turtle.turnLeft()
