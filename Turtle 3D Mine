@@ -1,31 +1,3 @@
-turtle.select(16)
---  This turtle program is designed to mine a 3D area of blocks
-
-
-print("Insert fuel into slot 16")
-print("Place Chest behind the turtle!")
-print("-----------------------------")
-print("Now enter the depth to be mined")
-
-depth = read()
-
-print("Now enter the length to be mined")
-
-width = read()
-
-print("Now enter the height to be mined")
-
-height = read()
-
-local status = "running"
-local CurDepth = 0
-local CurWidth = 0
---## array of object names that CheckObject() should check for
-local objectCheckNames = {"chest","torch"}
-
-
-
-
 -- #### FUNCTIONS ####
 
 -- ## Refueling
@@ -84,93 +56,113 @@ function Up()
   end
 end
 
-
-
 -- ## Dig Forward
 function Forward()
   while turtle.detect() do
     turtle.dig()
   end
+  turtle.forward()
 end
 
--- ## Dig Block height(
+-- ## Dig Block
 function DigBlock()
-  Forward()
-  turtle.forward() -- Move Forward
-  if height == 0 or 1 then
-  else
-    for i = 1, height do
+    Forward()
+  --for i = 1, height do
+    if turtle.detectUp() then
       Up()
       turtle.up()
-    end
-    for i = 1, height do
+      Up()
       turtle.down()
     end
-  end
 end
 
 -- ## Move to the next strip in the 3d area
 function NextLine()
   if CurWidth % 2 == 0 then
     turtle.turnRight()
-    Forward()
+    DigBlock()
     turtle.turnRight()
   else
     turtle.turnLeft()
-    Forward()
+    DigBlock()
     turtle.turnLeft()
   end
 end
 
-
--- ## Return to original position
-function ReturnToChest()
-  turtle.turnRight()
-  for i = 1, CurWidth do
-    Forward()
-  end
-  turtle.turnRight()
-  for i = 1, CurDepth do
-    Forward()
-  end
-  turtle.turnRight()
-end
-
-
 -- ## Drop Items In Chest
 function DropInChest()
+  turtle.forward()
   if turtle.detect() and CheckBlock("chest",false) then
     for i = 1, 13 do
       turtle.select(i)
       turtle.drop()
     end
+  else
+    print("No chest found!")
   end
   turtle.turnLeft()
+  turtle.turnLeft()
 end
+
+-- ## Mine the 3D Area
+function MineArea(depth,width)
+  DigBlock() -- Initial Dig to get into position
+  for w = 1, width do
+    CurWidth = w
+    for d = 1, depth - 1 do
+      CurDepth = d
+      CheckFuel()
+      DigBlock()
+    end
+    if CurWidth ~= width then
+      NextLine()
+    end
+  end
+end
+
+
+
+function MoveToOrigin()
+  turtle.turnRight()
+  for i = 1, CurWidth-1 do
+    turtle.forward()
+  end
+  turtle.turnRight()
+  for i = 1, CurDepth do
+    turtle.forward()
+  end
+end
+
 
 
 -- #### END OF FUNCTIONS ####
 
-Forward()
+turtle.select(16)
+--  This turtle program is designed to mine a 3D area of blocks
 
-for i = 1, width do
-  CurDepth = 0
-  CurWidth = i
+print("Insert fuel into slot 16")
+print("Place Chest behind the turtle!")
+print("-----------------------------")
 
-  for i = 1, depth do
-    CurDepth = i
-    CheckFuel()
+print("Now enter the depth to be mined")
+depth = tonumber(read()) or 0
+print("Now enter the length to be mined")
+width = tonumber(read()) or 0
+--print("Now enter the height to be mined")
+--height = tonumber(read()) or 3
 
-    if status == "running" then
-      DigBlock()
-    end
 
-  end
-  
-  ReturnToChest()
 
-  DropInChest()
-  
-  NextLine()
+local status = "running"
+local CurDepth = 0
+local CurWidth = 0
+local objectCheckNames = {"chest","torch"}
 
-end
+
+
+
+MineArea(depth,width)
+MoveToOrigin()
+DropInChest()
+
+
