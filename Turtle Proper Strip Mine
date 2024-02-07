@@ -87,7 +87,7 @@ function NextStrip()
       turtle.forward()
       turtle.turnLeft()
     else
-      forward()
+      Forward()
     end
   end
   turtle.turnRight()
@@ -114,7 +114,7 @@ function ReturnToChest()
   turtle.turnRight()
   
   for i = 1, CurLength do
-    forward()
+    Forward()
   end
 
   turtle.turnLeft()
