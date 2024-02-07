@@ -77,7 +77,7 @@ end
 function NextStrip()
   turtle.turnLeft()
   for i = 1, 4 do
-    if turtle.detect() then
+    if isChest() then
       turtle.turnLeft()
       turtle.forward()
       turtle.turnRight()
@@ -92,7 +92,20 @@ function NextStrip()
   end
   turtle.turnRight()
 end
-  
+
+
+-- ## function that detects if block in front is a chest
+function isChest()
+  if turtle.detect() then
+    local success, data = turtle.inspect()
+    if success then
+      if data.name == "minecraft:chest" then
+        return true
+      end
+    end
+  end
+  return false
+end
 
 
 -- ## Return to chest location
@@ -151,4 +164,3 @@ for i = 1, MaxStrips do
   NextStrip()
 
 end
-
