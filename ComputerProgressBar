@@ -1,0 +1,68 @@
+-- Get Equipment
+local Modem = peripheral.wrap("back")
+local peripheralNames = Modem.getNamesRemote()
+local monitorNamePattern = "monitor"
+local equipmentNamePattern = "furnace"
+
+
+-- Function to wrap a peripheral based on its name pattern
+local function wrapPeripheral(namePattern)
+    for _, name in ipairs(peripheralNames) do
+      if name:lower():find(namePattern:lower()) then
+        local peripheral = peripheral.wrap(name)
+        if peripheral == nil then
+          print("Error wrapping peripheral: " .. name)
+        else
+          return peripheral
+        end
+      end
+    end
+    print("Peripheral not found: " .. namePattern)
+    return nil
+end
+
+
+local monitor = wrapPeripheral(monitorNamePattern)
+local equipment = wrapPeripheral(equipmentNamePattern)
+print(equipment)
+
+
+local width, height = monitor.getSize() -- Get the size of the monitor
+local percentage = 0 -- Your variable to track progress
+
+
+-- Function to draw the progress bar
+local function drawProgressBar(percent)
+    local progressBarHeight = math.floor(height * (percent / 64)) -- Calculate height of progress bar
+    monitor.clear()
+    monitor.setBackgroundColor(colors.blue) -- Set background color to blue
+    for y = height, height - progressBarHeight + 1, -1 do
+        monitor.setCursorPos(1, y)
+        monitor.write(string.rep(" ", width)) -- Draw empty row to clear previous progress
+    end
+    monitor.setBackgroundColor(colors.black) -- Reset background color to black
+    local text = "     " .. tostring(math.floor(percent)) .. "   "
+    monitor.setCursorPos((width - #text) / 2, height / 2)
+    monitor.write(text)
+end
+
+while true do
+
+    if equipment.list()[1] == nil then
+        ItemCount = 0
+    else
+        ItemCount = equipment.list()[1].count
+    end
+	percentage = ItemCount
+    -- Increment percentage (replace this with your own logic)
+    --percentage = percentage + 1
+    --if percentage > 100 then
+        --percentage = 0
+    --end
+
+    -- Draw the progress bar
+    drawProgressBar(percentage)
+
+    -- You can adjust the sleep time to control the refresh rate
+    sleep(0.1) -- Adjust as needed
+end
