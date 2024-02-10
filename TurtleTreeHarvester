@@ -1,0 +1,138 @@
+turtle.select(16)
+
+print("Ensure turtle is facing the tree or sapling")
+print("Insert fuel into slot 16")
+print("Place chest behind the turtle")
+
+local status = "Watching"
+
+local harvested = 0 -- number of logs harvested
+
+-- #### FUNCTIONS ####
+
+-- ## Refueling
+function CheckFuel()
+  if turtle.getFuelLevel() < 200 then
+    turtle.select(16)
+    turtle.refuel()
+  end
+end
+
+
+-- ## Find Empty slot in inventory
+function FindEmptySlot()
+  for i = 1, 15 do
+    if turtle.getItemCount(i) ~= 64 then
+      return i
+    end
+  end
+  return false
+end
+
+
+-- ## Plant saplings
+function PlantSapling()
+  local saplingSlot = nil
+
+  for i = 1, 15 do
+    local itemData = turtle.getItemDetail(i)
+    if itemData and string.find(itemData.name, "sapling") then
+      saplingSlot = i
+      break
+    end
+  end
+  if saplingSlot then
+    turtle.select(saplingSlot)
+    turtle.place()
+  end
+end
+
+-- ## function to pickup items dropped nearby
+  function PickupItems()
+    turtle.select(FindEmptySlot())
+    turtle.suck()
+  end
+
+
+--## Check the block in front or up for matches
+function CheckBlock(Direction, Block)
+  local success, data
+
+  if Direction == "front" then
+    success, data = turtle.inspect()
+  elseif Direction == "up" then
+    success, data = turtle.inspectUp()
+  elseif Direction == "down" then
+    success, data = turtle.inspectDown()
+  end
+
+  return success and string.find(data.name, Block)
+end
+
+
+-- ## turn to face the chest and drop items into it.
+function DepositIntoChest()
+  status = "Depositing"
+  turtle.turnRight()
+  turtle.turnRight()
+  if CheckBlock("front", "chest") then
+    for i = 1, 15 do
+      local itemData = turtle.getItemDetail(i)
+      if itemData and not string.find(itemData.name, "sapling") then
+        turtle.select(i)
+        turtle.drop()
+      end
+    end
+  end
+  turtle.turnRight()
+  turtle.turnRight()
+  turtle.select(FindEmptySlot())
+  status = "Watching"
+end
+
+-- ## Dig the tree
+function digTree()
+  status = "Harvesting"
+
+  if CheckBlock("front","log") then
+    turtle.dig()
+    turtle.forward()
+  end
+  while CheckBlock("up","log") do
+    turtle.digUp()
+    turtle.up()
+    harvested = harvested + 1
+  end
+  for i = 1, harvested do
+    turtle.down()
+  end
+  turtle.back()
+  harvested = 0
+  PickupItems()
+  PlantSapling()
+  DepositIntoChest()
+
+end
+
+
+-- #### END OF FUNCTIONS ####
+
+-- ## Main Loop
+print(status)
+turtle.select(FindEmptySlot())
+
+while status == "Watching" do
+  CheckFuel()
+
+  if not turtle.detect() then
+    PickupItems()
+    PlantSapling()
+  end
+
+  if not CheckBlock("front", "log") then
+    sleep(1)
+  elseif CheckBlock("front", "log") then
+    digTree()
+  end
+
+end
