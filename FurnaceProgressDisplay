@@ -1,0 +1,212 @@
+--1.0.0
+--3x Monitors stacked Vertically
+
+-- ##[ CONFIGURATION ]#####################
+local modes = {
+  {index = 1, name = "Factory", maxEnergy = 12000},
+  {index = 2, name = "RedstoneFurnace", maxEnergy = 50000},
+  {index = 3, name = "VanillaFurnace", maxEnergy = 0}
+}
+local mode = 1
+-- Factory Energy Limit
+local energyLimit = modes[mode].maxEnergy
+-- ########################################
+
+
+-- ##[ Max Slots ]#########################
+local maxSlots = 3
+-- ########################################
+
+
+-- ##[ Peripherals ]#######################
+local monitor = peripheral.wrap("right")
+local factory = peripheral.wrap("left")
+-- ########################################
+
+
+-- ##[ Set Monitor Scale ]#################
+local width, height = monitor.getSize()
+local MonitorScale = 0.5
+monitor.setTextScale(MonitorScale)
+-- ########################################
+
+
+
+-- ##[ Draw Progress Bar ]#######################################################
+function drawFullBar(progress)
+
+    -- Calculate Bar Height from Percentage
+    local barHeight = math.floor(height * (progress / 100)-1)
+
+    -- Progress Bar Color
+    monitor.setBackgroundColor(colors.blue)
+
+    -- Draw Progress Bar
+    for y = height, height - barHeight, -1 do
+        monitor.setCursorPos(1, y)
+        monitor.write(string.rep(" ", width))
+    end
+
+    -- Background Color
+    monitor.setBackgroundColor(colors.black)
+    
+end
+-- ###############################################################################
+
+
+
+-- ##[ Draw Horizontal Bar ]#######################################################
+function drawHorizontalBar(YPos, progress)
+
+  -- Calculate Bar Height from Percentage
+  local barWidth = math.floor(width * (progress / 100)-1)
+
+  -- Progress Bar Color
+  monitor.setBackgroundColor(colors.white)
+
+  -- Draw Progress Bar
+  for x = 1, barWidth do
+      monitor.setCursorPos(x, YPos)
+      monitor.write(string.rep(" ", 2))
+  end
+
+  -- Background Color
+  monitor.setBackgroundColor(colors.black)
+  
+end
+-- ###############################################################################
+
+
+
+-- ##[ Draw Text ]################################################################
+function drawText(XPos, YPos, text)
+  monitor.setTextColor(colors.white)
+  monitor.setCursorPos(XPos, YPos)
+  monitor.write(text)
+end
+-- ###############################################################################
+
+
+
+-- ##[ Calculate Progress Percentage ]############################################
+function calculateProgress()
+  if mode == 1 then
+    local totalItems = 0
+    for i = 0, maxSlots-1 do
+      totalItems = totalItems + factory.getInput(i).count
+    end
+    return math.floor((totalItems / (maxSlots * 64)) * 100)
+  else
+    if factory.list()[1] ~= nil then
+      local totalItems = factory.list()[1].count
+      return math.floor((totalItems / 64 * 100))
+    else
+      return 0
+    end
+  end
+end
+-- ###############################################################################
+
+
+
+-- ##[ Transform Text into 3 Pixels ]#############################################
+function transformTextSpace(text)
+  if #text % 2 == 0 then
+    return text .. " "
+  else
+    return text
+  end
+end
+-- ###############################################################################
+
+
+
+-- ##[ Warning Bar ]##############################################################
+local function drawWarningBar()
+  if mode == 1 or mode == 2 then
+    if factory.getEnergy() < 5000 and factory.getEnergy() > 500 then
+      monitor.setBackgroundColor(colors.red)
+      for y = 1, 3 do
+          monitor.setCursorPos(1, y)
+          monitor.write(string.rep(" ", width))
+      end
+      monitor.setBackgroundColor(colors.black)
+      local text = "Low"
+      local textX = math.floor((width - #text) / 2) + 1
+      monitor.setCursorPos(textX, 2)
+      monitor.write(text)
+  
+    elseif factory.getEnergy() < 500 then
+      monitor.setBackgroundColor(colors.red)
+      for y = 1, 3 do
+          monitor.setCursorPos(1, y)
+          monitor.write(string.rep(" ", width))
+      end
+      monitor.setBackgroundColor(colors.black)
+      local text = "Empty"
+      local textX = math.floor((width - #text) / 2) + 1
+      monitor.setCursorPos(textX, 2)
+      monitor.write(text)
+    end
+  end
+end
+-- ###############################################################################
+
+
+-- ##[ Main Loop ]################################################################
+while true do
+  -- Clear Monitor
+  local percentage = calculateProgress()
+
+
+  if mode == 1 then
+    recipeProgress1 = math.floor(factory.getRecipeProgress(0) / 2)
+    recipeProgress2 = math.floor(factory.getRecipeProgress(1) / 2)
+    recipeProgress3 = math.floor(factory.getRecipeProgress(2) / 2)
+    totalInput = 0
+    totalOutput = 0
+    for i = 0, maxSlots-1 do
+      totalInput = totalInput + factory.getInput(i).count
+      totalOutput = totalOutput + factory.getOutput(i).count
+    end
+    totalInputText = transformTextSpace(tostring(totalInput))
+    totalOutputText = transformTextSpace(tostring(totalOutput))
+    totalInputTextWidth = math.floor((width - #totalInputText) / 2) + 1
+    totalOutputTextWidth = math.floor((width - #totalOutputText) / 2) + 1
+  end
+
+  if mode == 2 then
+    recipeProgress1 = math.floor(factory.getEnergy() / energyLimit * 100)
+  end
+
+-- ###############################################################################
+
+  monitor.clear()
+
+  if mode == 1 then
+    drawFullBar(percentage)
+    drawText(1, 2, tostring(recipeProgress1 .. "%"))
+    drawText(1, 4, tostring(recipeProgress2 .. "%"))
+    drawText(1, 6, tostring(recipeProgress3 .. "%"))
+
+    drawHorizontalBar(1, recipeProgress1)
+    drawHorizontalBar(3, recipeProgress2)
+    drawHorizontalBar(5, recipeProgress3)
+    drawText(totalInputTextWidth, height-2, totalInputText)
+    drawText(totalOutputTextWidth, height, totalOutputText)
+  end
+
+  if mode == 2 then
+    drawFullBar(percentage)
+    drawText(1, 2, tostring(recipeProgress1 .. "%"))
+    drawHorizontalBar(1, recipeProgress1)
+  end
+
+  if mode == 3 then
+    drawFullBar(percentage)
+  end
+
+  sleep(0.1)
+  drawWarningBar()
+end
+-- ###############################################################################
