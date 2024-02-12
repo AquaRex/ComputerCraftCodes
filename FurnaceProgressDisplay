@@ -1,5 +1,4 @@
 --1.0.0
---3x Monitors stacked Vertically
 
 -- ##[ CONFIGURATION ]#####################
 local modes = {
@@ -155,56 +154,57 @@ end
 
 -- ##[ Main Loop ]################################################################
 while true do
-  -- Clear Monitor
   local percentage = calculateProgress()
 
+  local recipeProgress = {}
 
+  
+  -- Mode 1: Factory
   if mode == 1 then
-    recipeProgress1 = math.floor(factory.getRecipeProgress(0) / 2)
-    recipeProgress2 = math.floor(factory.getRecipeProgress(1) / 2)
-    recipeProgress3 = math.floor(factory.getRecipeProgress(2) / 2)
-    totalInput = 0
-    totalOutput = 0
+    for i = 0, maxSlots-1 do
+      recipeProgress[i] = math.floor(factory.getRecipeProgress(i) / 2)
+    end
+    local totalInput = 0
+    local totalOutput = 0
     for i = 0, maxSlots-1 do
       totalInput = totalInput + factory.getInput(i).count
       totalOutput = totalOutput + factory.getOutput(i).count
     end
-    totalInputText = transformTextSpace(tostring(totalInput))
-    totalOutputText = transformTextSpace(tostring(totalOutput))
-    totalInputTextWidth = math.floor((width - #totalInputText) / 2) + 1
-    totalOutputTextWidth = math.floor((width - #totalOutputText) / 2) + 1
-  end
+    local totalInputText = transformTextSpace(tostring(totalInput))
+    local totalOutputText = transformTextSpace(tostring(totalOutput))
+    local totalInputTextWidth = math.floor((width - #totalInputText) / 2) + 1
+    local totalOutputTextWidth = math.floor((width - #totalOutputText) / 2) + 1
 
-  if mode == 2 then
-    recipeProgress1 = math.floor(factory.getEnergy() / energyLimit * 100)
-  end
+    monitor.clear()
 
--- ###############################################################################
-
-  monitor.clear()
-
-  if mode == 1 then
     drawFullBar(percentage)
-    drawText(1, 2, tostring(recipeProgress1 .. "%"))
-    drawText(1, 4, tostring(recipeProgress2 .. "%"))
-    drawText(1, 6, tostring(recipeProgress3 .. "%"))
-
-    drawHorizontalBar(1, recipeProgress1)
-    drawHorizontalBar(3, recipeProgress2)
-    drawHorizontalBar(5, recipeProgress3)
+    for i = 0, maxSlots-1 do
+      drawHorizontalBar(1 + 1 + ((1 + 2) * i), recipeProgress[i])
+      drawText(1, 2 + ((1 + 2) * i), tostring(recipeProgress[i] .. "%"))
+    end
     drawText(totalInputTextWidth, height-2, totalInputText)
     drawText(totalOutputTextWidth, height, totalOutputText)
   end
 
+
+  -- Mode 2: Redstone Furnace
   if mode == 2 then
+    recipeProgress[1] = math.floor(factory.getEnergy() / energyLimit * 100)
+
+    monitor.clear()
+
     drawFullBar(percentage)
-    drawText(1, 2, tostring(recipeProgress1 .. "%"))
-    drawHorizontalBar(1, recipeProgress1)
+    drawText(1, 2, tostring(recipeProgress[1] .. "%"))
+    drawHorizontalBar(1, recipeProgress[1])
   end
 
+
+  -- Mode 3: Vanilla Furnace
   if mode == 3 then
+    monitor.clear()
     drawFullBar(percentage)
   end
+
 
   sleep(0.1)
   drawWarningBar()
